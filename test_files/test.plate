@@ -1,0 +1,4 @@
+---
+one: list
+two: string
+TEMPLATE_ROOT: "./template_dirs/test1"
