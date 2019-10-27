@@ -15,15 +15,11 @@ func main() {
 	args := GetArgsConfig()
 
 	ValidateConfig(args)
-
-	if args.OutputPath == "" {
-		log.Fatal("-out Must be set")
-	}
-
 	log.Printf("args is: %+v\n", args)
 
 	plate, err := config.LoadPlateFile(args.ConfigPath)
 	log.Printf("%v\n", plate)
+
 	valid := plate.ValidatePlateFile()
 	if !valid {
 		log.Fatalf("Platefile invalid")
