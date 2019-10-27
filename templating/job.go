@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/flosch/pongo2"
-	"github.com/mrWinston/boilr/typeconv"
 )
 
 type renderJob struct {
@@ -27,10 +26,8 @@ func splitJob(job renderJob) ([]renderJob, error) {
 	if _, ok := job.context[arrayVarName]; !ok {
 		return nil, fmt.Errorf("Can not find key %v for job %v", arrayVarName, job)
 	}
-	values, err := typeconv.StringifySlice(job.context[arrayVarName].([]interface{}))
-	if err != nil {
-		return nil, err
-	}
+
+	values := job.context[arrayVarName].([]string)
 
 	var jobs []renderJob
 	for _, value := range values {
@@ -39,7 +36,7 @@ func splitJob(job renderJob) ([]renderJob, error) {
 
 		jobs = append(jobs, renderJob{
 			inFile:  job.inFile,
-			outFile: strings.Replace(job.outFile, wholeMatch, value, 1),
+			outFile: strings.Replace(job.outFile, wholeMatch, fmt.Sprintf("%v", value), 1),
 			context: newContext,
 		})
 	}

@@ -21,6 +21,70 @@ var reservedKeys = map[string]bool{
 	"WORKDIR":       true,
 }
 
+// CommandConfig stores the configuration for a run cmd
+type CommandConfig struct {
+	Name    string `yaml:"name"`
+	Command string `yaml:"command"`
+	Workdir string `yaml:"workdir"`
+}
+
+// Return the String representation
+func (commandConfig *CommandConfig) String() string {
+	return fmt.Sprintf("{Name: '%s', Command: '%s', Workdir: '%s'}", commandConfig.Name, commandConfig.Command, commandConfig.Workdir)
+}
+
+// Config Holds the configuration for rendering the template
+type Config struct {
+	TemplateRoot string `yaml:"template_root"`
+}
+
+// PlateFile Represents the *.plate files
+type PlateFile struct {
+	Vars     map[string]string `yaml:"vars"`
+	Config   Config            `yaml:"config"`
+	Commands []CommandConfig   `yaml:"commands"`
+}
+
+// ValidatePlateFile Validates a given PlateFile for correctnes
+func (plateFile *PlateFile) ValidatePlateFile() bool {
+
+	return true
+}
+
+// GetVarsFromUser Queries the user for input
+func (plateFile *PlateFile) GetVarsFromUser() (pongo2.Context, error) {
+	context := pongo2.Context{}
+	for k, v := range plateFile.Vars {
+		input, err := GetInputByName(v)
+		if err != nil {
+			return nil, err
+		}
+
+		context[k], err = input.Ask(v, os.Stdin, os.Stdout)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return context, nil
+}
+
+// LoadPlateFile Loads a plate file from the given path. Returns an error when
+// reading the file fails. Does not validate the plate file
+func LoadPlateFile(path string) (*PlateFile, error) {
+	var config PlateFile
+	fileContent, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	err = yaml.Unmarshal(fileContent, &config)
+
+	fmt.Printf("%v", config)
+
+	return &config, err
+}
+
 // LoadTemplateConfig loads a .plate file for templating. It returns an error
 // in case either the unmarshalling of the yml is unseccessful or the file can
 // not be read.
@@ -83,6 +147,7 @@ func QueryVarsFromUser(config map[string]string) pongo2.Context {
 	return context
 }
 
+// GetVarsFromYaml is deprecated
 func GetVarsFromYaml(path string, config map[string]string) (pongo2.Context, error) {
 	//	context := pongo2.Context{}
 	m := make(map[string]interface{})
@@ -99,14 +164,14 @@ func GetVarsFromYaml(path string, config map[string]string) (pongo2.Context, err
 	}
 
 	// check if all keys from vars file are present in config
-	for k, _ := range m {
+	for k := range m {
 		if _, ok := config[k]; !ok {
 			return nil, fmt.Errorf("Key '%v' from vars file not defined in Config", k)
 		}
 	}
 
 	// check if all keys from config are present in vars file
-	for k, _ := range config {
+	for k := range config {
 		if reservedKeys[k] { // we do not expect to find the reserved keys in the vars file
 			continue
 		}

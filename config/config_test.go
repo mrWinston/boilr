@@ -5,54 +5,77 @@ import (
 	"testing"
 )
 
-func TestLoadTemplateConfig(t *testing.T) {
+func TestLoadPlateFile(t *testing.T) {
 	type args struct {
 		path string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    map[string]string
+		want    *PlateFile
 		wantErr bool
 	}{
 		{
-			name: "Load Test Config",
+			name: "Complete 1",
 			args: args{
-				path: "../test_files/test.plate",
+				path: "../test_files/plate_files/complete_1.yml",
 			},
-			want: map[string]string{
-				"TEMPLATE_ROOT": "./test1",
-				"one":           "list",
-				"two":           "string",
+			want: &PlateFile{
+				Vars: map[string]string{
+					"string":  "string",
+					"integer": "int",
+					"list":    "list",
+				},
+				Config: Config{
+					TemplateRoot: "./complete_1",
+				},
+				Commands: []CommandConfig{
+					CommandConfig{
+						Name:    "show me some stuff",
+						Command: "ls",
+						Workdir: ".",
+					},
+					CommandConfig{
+						Name:    "run a thing",
+						Command: "./run.sh",
+						Workdir: "./bin",
+					},
+				},
 			},
 			wantErr: false,
 		},
 		{
-			name: "Load Invalid Config",
+			name: "Minimal",
 			args: args{
-				path: "../test_files/test_invalid.plate",
+				path: "../test_files/plate_files/minimal.yml",
 			},
-			want:    nil,
-			wantErr: true,
+			want: &PlateFile{
+				Vars: nil,
+				Config: Config{
+					TemplateRoot: "./minimal",
+				},
+				Commands: nil,
+			},
+			wantErr: false,
 		},
 		{
-			name: "Load Nonexistent Config",
+			name: "Nonexistant Root Entries",
 			args: args{
-				path: "./alshflkasfhlkfsh",
+				path: "../test_files/plate_files/nonexistant_root_entries.yml",
 			},
-			want:    nil,
-			wantErr: true,
+			want:    &PlateFile{},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := LoadTemplateConfig(tt.args.path)
+			got, err := LoadPlateFile(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("LoadTemplateConfig() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("LoadPlateFile() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("LoadTemplateConfig() = %v, want %v", got, tt.want)
+				t.Errorf("LoadPlateFile() = %v, want %v", got, tt.want)
 			}
 		})
 	}

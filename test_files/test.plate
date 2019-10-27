@@ -1,4 +1,7 @@
 ---
-one: list
-two: string
-TEMPLATE_ROOT: "./template_dirs/test1"
+vars:
+  one: int
+  two: string
+  three: bool
+config:
+  template_root: "./template_dirs/test1"

@@ -1,0 +1,3 @@
+---
+config:
+  template_root: ./minimal

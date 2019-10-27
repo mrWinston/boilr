@@ -103,6 +103,9 @@ func Test_splitJobSingle(t *testing.T) {
 	twoEnvContext := pongo2.Context{
 		"envs": []string{"one", "two"},
 	}
+	//	threeEnvContext := pongo2.Context{
+	//		"envs": []interface{}{"one", 2, 3.0},
+	//	}
 	//	eightEnvContext := pongo2.Context{
 	//		"envs": []string{"1", "2", "3", "4", "5", "6", "7", "8"},
 	//	}

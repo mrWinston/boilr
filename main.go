@@ -20,24 +20,37 @@ func main() {
 		log.Fatal("-out Must be set")
 	}
 
-	vars, err := config.LoadTemplateConfig(args.ConfigPath)
+	log.Printf("args is: %+v\n", args)
+
+	plate, err := config.LoadPlateFile(args.ConfigPath)
+	log.Printf("%v\n", plate)
+	valid := plate.ValidatePlateFile()
+	if !valid {
+		log.Fatalf("Platefile invalid")
+	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	templateFolder, err := filepath.Abs(args.ConfigPath)
 	templateFolder = filepath.Dir(templateFolder)
-	templateFolder = fmt.Sprintf("%s/%s", templateFolder, vars["TEMPLATE_ROOT"])
+	templateFolder = fmt.Sprintf("%s/%s", templateFolder, plate.Config.TemplateRoot)
 	context := pongo2.Context{}
-	if args.VarsFile != "" {
-		varsFile, _ := filepath.Abs(args.VarsFile)
-		context, err = config.GetVarsFromYaml(varsFile, vars)
-		if err != nil {
-			log.Fatalf("Error while reading vars from '%s' : %v\n", varsFile, err)
-		}
-	} else {
-		context = config.QueryVarsFromUser(vars)
+	context, err = plate.GetVarsFromUser()
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	//if args.VarsFile != "" {
+	//	varsFile, _ := filepath.Abs(args.VarsFile)
+	//	context, err = config.GetVarsFromYaml(varsFile, vars)
+	//	if err != nil {
+	//		log.Fatalf("Error while reading vars from '%s' : %v\n", varsFile, err)
+	//	}
+	//} else {
+	//	context = plate.GetVarsFromUser()
+	//}
 
 	err = templating.Render(context, templateFolder, args.OutputPath)
 	if err != nil {

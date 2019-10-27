@@ -1,0 +1,15 @@
+---
+vars:
+  string: string
+  integer: int
+  list: list
+config:
+  template_root: ./complete_1
+
+commands:
+  - name: show me some stuff
+    command: ls
+    workdir: .
+  - name: run a thing
+    command: ./run.sh
+    workdir: ./bin
