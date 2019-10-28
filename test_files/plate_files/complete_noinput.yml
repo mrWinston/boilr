@@ -1,0 +1,15 @@
+---
+vars:
+  string: string
+  integer: int
+  list: list
+config:
+  template_root: ../template_dirs/complete_noinput
+
+commands:
+  - name: show me some stuff
+    command: ls
+    workdir: .
+  - name: run a thing
+    command: ./run.sh
+    workdir: ./bin

@@ -33,7 +33,12 @@ func main() {
 	templateFolder = filepath.Dir(templateFolder)
 	templateFolder = fmt.Sprintf("%s/%s", templateFolder, plate.Config.TemplateRoot)
 	context := pongo2.Context{}
-	context, err = plate.GetVarsFromUser()
+
+	if args.VarsFile == "" {
+		context, err = plate.GetVarsFromUser()
+	} else {
+		context, err = plate.GetVarsFromYaml(args.VarsFile)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}

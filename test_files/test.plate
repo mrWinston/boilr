@@ -1,7 +1,0 @@
----
-vars:
-  one: int
-  two: string
-  three: bool
-config:
-  template_root: "./template_dirs/test1"

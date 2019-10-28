@@ -1,7 +1,0 @@
----
-stringvar: string
-intvar: int
-listvar: list
-mapvar: map
-TEMPLATE_ROOT: ./sample
-CMD: tree

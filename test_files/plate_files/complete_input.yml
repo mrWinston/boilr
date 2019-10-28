@@ -4,7 +4,7 @@ vars:
   integer: int
   list: list
 config:
-  template_root: ./complete_1
+  template_root: ../template_dirs/complete_input
 
 commands:
   - name: show me some stuff

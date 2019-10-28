@@ -1,0 +1,8 @@
+---
+string: This is the String var
+integer: 12
+list:
+  - This is the first list element
+  - This is the second
+  - This is the third
+

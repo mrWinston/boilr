@@ -1,11 +1,9 @@
-package config
+package input
 
 import (
 	"fmt"
 	"io"
 	"reflect"
-
-	"github.com/mrWinston/boilr/config/query"
 )
 
 // InputType represents an Input from a plate file.
@@ -20,22 +18,22 @@ var AvailableInputs = []*InputType{
 	&InputType{
 		Name: "bool",
 		Kind: reflect.Bool,
-		Ask:  query.AskBool,
+		Ask:  AskBool,
 	},
 	&InputType{
 		Name: "string",
 		Kind: reflect.String,
-		Ask:  query.AskString,
+		Ask:  AskString,
 	},
 	&InputType{
 		Name: "int",
 		Kind: reflect.Int,
-		Ask:  query.AskInt,
+		Ask:  AskInt,
 	},
 	&InputType{
 		Name: "list",
 		Kind: reflect.Slice,
-		Ask:  query.AskList,
+		Ask:  AskList,
 	},
 }
 

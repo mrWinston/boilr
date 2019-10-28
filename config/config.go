@@ -13,6 +13,7 @@ import (
 
 	"github.com/flosch/pongo2"
 	"github.com/go-yaml/yaml"
+	"github.com/mrWinston/boilr/input"
 )
 
 var reservedKeys = map[string]bool{
@@ -55,7 +56,7 @@ func (plateFile *PlateFile) ValidatePlateFile() bool {
 func (plateFile *PlateFile) GetVarsFromUser() (pongo2.Context, error) {
 	context := pongo2.Context{}
 	for k, v := range plateFile.Vars {
-		input, err := GetInputByName(v)
+		input, err := input.GetInputByName(v)
 		if err != nil {
 			return nil, err
 		}
@@ -67,6 +68,32 @@ func (plateFile *PlateFile) GetVarsFromUser() (pongo2.Context, error) {
 	}
 
 	return context, nil
+}
+
+func (plateFile *PlateFile) GetVarsFromYaml(path string) (pongo2.Context, error) {
+
+	m := make(map[string]interface{})
+
+	fileContent, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	err = yaml.Unmarshal(fileContent, &m)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for key, _ := range m {
+		if _, ok := plateFile.Vars[key]; !ok {
+			return nil, fmt.Errorf("Key %s not defined in PlateFile", key)
+		}
+	}
+
+	fmt.Printf("%v", m)
+	return m, err
+
 }
 
 // LoadPlateFile Loads a plate file from the given path. Returns an error when
