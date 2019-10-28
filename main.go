@@ -43,16 +43,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//if args.VarsFile != "" {
-	//	varsFile, _ := filepath.Abs(args.VarsFile)
-	//	context, err = config.GetVarsFromYaml(varsFile, vars)
-	//	if err != nil {
-	//		log.Fatalf("Error while reading vars from '%s' : %v\n", varsFile, err)
-	//	}
-	//} else {
-	//	context = plate.GetVarsFromUser()
-	//}
-
 	err = templating.Render(context, templateFolder, args.OutputPath)
 	if err != nil {
 		log.Fatal(err)
