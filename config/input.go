@@ -32,6 +32,11 @@ var AvailableInputs = []*InputType{
 		Kind: reflect.Int,
 		Ask:  query.AskInt,
 	},
+	&InputType{
+		Name: "list",
+		Kind: reflect.Slice,
+		Ask:  query.AskList,
+	},
 }
 
 // GetInputByKind searches the AvailableInputs for one that matches the
