@@ -42,7 +42,6 @@ func GetInputByKind(kind reflect.Kind) (*InputType, error) {
 			return input, nil
 		}
 	}
-
 	return nil, fmt.Errorf("Type %v not supported", kind)
 }
 

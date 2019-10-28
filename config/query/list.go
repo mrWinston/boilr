@@ -4,28 +4,25 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"strconv"
 	"strings"
 )
 
 func AskList(valueName string, in io.Reader, out io.Writer) (interface{}, error) {
 	reader := bufio.NewReader(in)
 	fmt.Fprintf(out, "Please enter the values for '%s' [list]. Items separated by <return>. End input with an empty line: \n", valueName)
-	out_list := make([]string)
-	var input string
-
+	out_list := []string{}
 	var err error
-	input, err = reader.ReadString('\n')
-	if err != nil {
-		return 0, err
+
+	for input := "placeholder"; input != "\n"; input, err = reader.ReadString('\n') {
+		if err != nil {
+			return out_list, err
+		}
+
+		input = strings.Replace(input, "\n", "", -1)
+		out_list = append(out_list, input)
 	}
-
-	input = strings.Replace(input, "\n", "", -1)
-
-	value, err := strconv.Atoi(input)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-
-	return value, nil
+	return out_list, nil
 }

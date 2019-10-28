@@ -3,6 +3,7 @@ package query
 import (
 	"bytes"
 	"io"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -15,7 +16,7 @@ func TestAskList(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    int
+		want    []string
 		wantOut string
 		wantErr bool
 	}{
@@ -30,40 +31,78 @@ func TestAskList(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test Invalid",
+			name: "Test one Element",
 			args: args{
-				valueName: "zero",
-				in:        strings.NewReader("b\nkasj\nkj\n0\n"),
+				valueName: "list",
+				in:        strings.NewReader("one\n\n"),
 			},
-			want:    0,
-			wantOut: "Please enter a value for 'zero' [number]: ",
-			wantErr: true,
+			want:    []string{"one"},
+			wantOut: "Please enter the values for 'list' [list]. Items separated by <return>. End input with an empty line: \n",
+			wantErr: false,
 		},
 		{
-			name: "Test EOF",
+			name: "Test Some Elements",
 			args: args{
-				valueName: "zero",
-				in:        strings.NewReader("bkasjkj0"),
+				valueName: "list",
+				in:        strings.NewReader("one\ntwo\nthree\nfour\nfive\nsix\n\n"),
 			},
-			want:    0,
-			wantOut: "Please enter a value for 'zero' [number]: ",
+			want:    []string{"one", "two", "three", "four", "five", "six"},
+			wantOut: "Please enter the values for 'list' [list]. Items separated by <return>. End input with an empty line: \n",
+			wantErr: false,
+		},
+		{
+			name: "Test No Input",
+			args: args{
+				valueName: "list",
+				in:        strings.NewReader(""),
+			},
+			want:    nil,
+			wantOut: "Please enter the values for 'list' [list]. Items separated by <return>. End input with an empty line: \n",
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			out := &bytes.Buffer{}
-			got, err := AskInt(tt.args.valueName, tt.args.in, out)
+			got, err := AskList(tt.args.valueName, tt.args.in, out)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("AskInt() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AskList() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != tt.want {
-				t.Errorf("AskInt() = %v, want %v", got, tt.want)
+			if isStringSliceEqualToInterface(got, tt.want) {
+				t.Errorf("AskList() = %v, want %v", got, tt.want)
 			}
 			if gotOut := out.String(); gotOut != tt.wantOut {
-				t.Errorf("AskInt() = %v, want %v", gotOut, tt.wantOut)
+				t.Errorf("AskList() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})
 	}
+}
+
+func isStringSliceEqualToInterface(inter interface{}, slice []string) bool {
+	if inter == nil && slice == nil {
+		return true
+	}
+	if inter == nil || slice == nil {
+		return false
+	}
+
+	switch reflect.TypeOf(inter).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(inter)
+		if s.Len() != len(slice) {
+			return false
+		}
+
+		for i := 0; i < len(slice); i++ {
+			if s.Index(i).Interface() != slice[i] {
+				return false
+			}
+		}
+		return true
+
+	default:
+		return false
+	}
+
 }
